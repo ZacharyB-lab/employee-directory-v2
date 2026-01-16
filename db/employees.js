@@ -1,15 +1,40 @@
-const employees = [
-  { id: 1, name: "Carolynn McGinlay" },
-  { id: 2, name: "Lodovico Filon" },
-  { id: 3, name: "Jefferey Wahlberg" },
-  { id: 4, name: "Kayley Tures" },
-  { id: 5, name: "Rickard Carver" },
-  { id: 6, name: "Michael Stryde" },
-  { id: 7, name: "Averell Santino" },
-  { id: 8, name: "Constantina Connue" },
-  { id: 9, name: "Verile Bondesen" },
-  { id: 10, name: "Gwen Grollmann" },
-];
+import express from "express";
+const router = express.Router();
+export default router;
 
-/* WARNING: this must remain the default export in order for the tests to work! */
-export default employees;
+import employees, {
+  addEmployee,
+  getEmployeeById,
+  getRandomEmployee,
+} from "#db/employees";
+
+router.get("/", (req, res) => {
+  res.send(employees);
+});
+
+router.post("/", (req, res) => {
+  if (!req.body) return res.status(400).send("Request body is required.");
+
+  const { name } = req.body;
+  if (!name) return res.status(400).send("Name is required.");
+
+  const employee = addEmployee(name);
+  res.status(201).send(employee);
+});
+
+router.get("/random", (req, res) => {
+  const employee = getRandomEmployee();
+  res.send(employee);
+});
+
+router.get("/:id", (req, res) => {
+  const { id } = req.params;
+
+  const employee = getEmployeeById(+id);
+
+  if (!employee) {
+    return res.status(404).send("Employee not found");
+  }
+
+  res.send(employee);
+});
